@@ -50,8 +50,6 @@ public class Bullet : IGameObject
         if (mon.Count > 0) {
             Monster first = mon[0];
 
-            //double angle = Math.Atan2(first.Rect.Y - Rect.Y, first.Rect.X - Rect.X);
-            game.SetTitle($"Angle: " + angle);
             float dirX = (float)Math.Cos(angle);
             float dirY = (float)Math.Sin(angle);
             rect.X += (dirX * 20) * delta;

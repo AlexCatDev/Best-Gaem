@@ -37,7 +37,6 @@ public class Monster : IGameObject
     {
         g.DrawString("HP: " + Math.Floor(health), new Font(FontFamily.Families.Where((o) => o.Name == "Segoe UI").First(), 12), Brushes.White, new PointF(rect.X + 2, rect.Y - 34));
         g.FillRectangle(Brushes.Red, rect);
-        //g.DrawEllipse(Pens.Blue, rect);
     }
 
     public void Hit(float damage)
@@ -46,7 +45,7 @@ public class Monster : IGameObject
 
         if (health < 1) {
             game.DestroyObject(this);
-            MessageBox.Show("Eyy u won");
+            MessageBox.Show("Eyy u won skrrrt");
             game.Quit();
         }
     }
@@ -67,16 +66,7 @@ public class Monster : IGameObject
             velY = r.Next(8, 30);
         else if (rect.Y > game.GameArea.Height - rect.Height)
             velY = -r.Next(8, 30);
-        /*
-            Player p = game.GetObjects<Player>().First();
-            double angle = Math.Atan2(p.Rect.Y - Rect.Y, p.Rect.X - Rect.X);
 
-            float dirX = (float)Math.Cos(angle);
-            float dirY = (float)Math.Sin(angle);
-
-            velX = dirX * 5;
-            velY = dirY * 5;
-            */
         rect.Y += velY * delta;
         rect.X += velX * delta;
     }

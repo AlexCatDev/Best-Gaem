@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 
@@ -11,6 +12,8 @@ public class Player : IGameObject
     float fireRate;
     float lastFire;
 
+    float guideLength = 200f;
+
     public RectangleF Rect {
         get {
             return rect;
@@ -22,8 +25,7 @@ public class Player : IGameObject
         rect = new RectangleF(100,200,48,48);
         speed = 16f;
         lastFire = 0;
-        //Every 375 milliseconds
-        fireRate = 10;
+        fireRate = 15;
     }
 
 
@@ -31,7 +33,12 @@ public class Player : IGameObject
     {
         g.CompositingQuality = CompositingQuality.HighSpeed;
         g.FillRectangle(Brushes.LimeGreen, rect);
-        g.DrawLine(Pens.Blue, new PointF(Rect.X - Rect.Width / 2f, Rect.Y - Rect.Width / 2f), new PointF(Rect.X + 10, Rect.Y + 10));
+        PointF point1 = new PointF(rect.X + rect.Width / 2f, rect.Y + rect.Height / 2f);
+
+        float angle = (float)Math.Atan2(game.CursorPosition.Y - rect.Y, game.CursorPosition.X - rect.X);
+
+        PointF point2 = new PointF(rect.X + (float)Math.Cos(angle) * guideLength, rect.Y + (float)Math.Sin(angle) * guideLength);
+        g.DrawLine(Pens.Blue, point1, point2);
     }
 
     float elapsed = 0;
@@ -55,10 +62,10 @@ public class Player : IGameObject
         if (Input.GetKey(Keys.H))
             HUD.Instance.AddHealth(1);
 
-        if (Input.GetKey(Keys.Space)) {
+        if (Input.GetKey(Keys.LButton)) {
             if(elapsed - lastFire >= fireRate){
                 if (HUD.Instance.GetAmmo() > 0) {
-                        game.SpawnObject(new Bullet(rect.X + 16, rect.Y));
+                        game.SpawnObject(new Bullet(rect.X + rect.Width / 2f, rect.Y + rect.Height / 2f));
                     lastFire = elapsed;
                     HUD.Instance.RemoveAmmo(1);
                 }

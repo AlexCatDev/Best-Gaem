@@ -60,7 +60,7 @@ public class Game
         bf.Render();
     }
 
-    public Point CursorPosition => Cursor.Position;
+    public Point CursorPosition => parentContainer.PointToClient (Cursor.Position);
 
     public List<T> GetObjects<T>()
         where T : IGameObject
@@ -99,8 +99,8 @@ public class Game
     public void Init()
     {
         SpawnObject(new Player());
-        SpawnObject(new HUD());
         SpawnObject(new Monster());
+        SpawnObject(new HUD());
         engine.Init();
     }
 

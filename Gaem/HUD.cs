@@ -36,7 +36,7 @@ public class HUD : IGameObject
         health = 100f;
         maxHealth = 100f;
         minHealth = 100f;
-        ammo = 5;
+        ammo = Int32.MaxValue;
         rect = new RectangleF(50, 50, 200, 32);
         instance = this;
     }
@@ -92,7 +92,7 @@ public class HUD : IGameObject
         if(health > 0 && value <= health)
         health -= value;
 
-        if(health == 0) {
+        if(health <= 1) {
             MessageBox.Show("You have lost :(");
             game.Quit();
         }

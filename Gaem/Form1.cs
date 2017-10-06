@@ -22,6 +22,7 @@ namespace Gaem
             CheckForIllegalCrossThreadCalls = false;
             SetStyle(ControlStyles.UserPaint, true);
             SetStyle(ControlStyles.AllPaintingInWmPaint, true);
+
             game = new Game(this);
             game.Init();
         }

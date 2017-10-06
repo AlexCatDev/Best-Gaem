@@ -19,8 +19,8 @@ public class Player : IGameObject
 
     public Player()
     {
-        rect = new RectangleF(100,200,64,64);
-        speed = 8f;
+        rect = new RectangleF(100,200,48,48);
+        speed = 16f;
         lastFire = 0;
         //Every 375 milliseconds
         fireRate = 10;
@@ -30,7 +30,8 @@ public class Player : IGameObject
     public void OnRender(Graphics g)
     {
         g.CompositingQuality = CompositingQuality.HighSpeed;
-        g.FillRectangle(Brushes.Red, rect);
+        g.FillRectangle(Brushes.LimeGreen, rect);
+        g.DrawLine(Pens.Blue, new PointF(Rect.X - Rect.Width / 2f, Rect.Y - Rect.Width / 2f), new PointF(Rect.X + 10, Rect.Y + 10));
     }
 
     float elapsed = 0;
@@ -39,16 +40,16 @@ public class Player : IGameObject
     {
         elapsed += delta;
 
-        if (Input.GetKey(Keys.Up))
+        if (Input.GetKey(Keys.W))
             rect.Y -= speed * delta;
 
-        if (Input.GetKey(Keys.Down))
+        if (Input.GetKey(Keys.S))
             rect.Y += speed * delta;
 
-        if (Input.GetKey(Keys.Right))
+        if (Input.GetKey(Keys.D))
             rect.X += speed * delta;
 
-        if (Input.GetKey(Keys.Left))
+        if (Input.GetKey(Keys.A))
             rect.X -= speed * delta;
 
         if (Input.GetKey(Keys.H))
@@ -57,20 +58,22 @@ public class Player : IGameObject
         if (Input.GetKey(Keys.Space)) {
             if(elapsed - lastFire >= fireRate){
                 if (HUD.Instance.GetAmmo() > 0) {
-                    game.SpawnObject(new Bullet(rect.X + 16, rect.Y));
+                        game.SpawnObject(new Bullet(rect.X + 16, rect.Y));
                     lastFire = elapsed;
                     HUD.Instance.RemoveAmmo(1);
                 }
             }
         }
 
-        var monInsect = game.GetSpecific<Monster>();
+        var monInsect = game.GetObjects<Monster>();
 
         if (monInsect.Count > 0) {
             if(monInsect[0].Rect.IntersectsWith(rect))
-            HUD.Instance.SubtractHealth(1f);
+            HUD.Instance.SubtractHealth(3f*delta);
         }
 
+        rect.X = Game.Clamp(rect.X, 0, game.GameArea.Width - rect.Width);
+        rect.Y = Game.Clamp(rect.Y, 0, game.GameArea.Height - rect.Height);
     }
 
     public void OnSpawn(Game game)

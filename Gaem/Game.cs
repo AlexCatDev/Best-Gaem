@@ -60,7 +60,9 @@ public class Game
         bf.Render();
     }
 
-    public List<T> GetSpecific<T>()
+    public Point CursorPosition => Cursor.Position;
+
+    public List<T> GetObjects<T>()
         where T : IGameObject
     {
         List<T> temp = new List<T>();

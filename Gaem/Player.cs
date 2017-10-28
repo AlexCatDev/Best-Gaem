@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Gaem;
+using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
@@ -31,14 +32,14 @@ public class Player : IGameObject
 
     public void OnRender(Graphics g)
     {
-        g.CompositingQuality = CompositingQuality.HighSpeed;
-        g.FillRectangle(Brushes.LimeGreen, rect);
+        g.SmoothingMode = SmoothingMode.AntiAlias;
+        g.FillRectangle(ColorPalette.BrushLightBlue, rect);
         PointF point1 = new PointF(rect.X + rect.Width / 2f, rect.Y + rect.Height / 2f);
 
         float angle = (float)Math.Atan2(game.CursorPosition.Y - rect.Y, game.CursorPosition.X - rect.X);
 
         PointF point2 = new PointF(rect.X + (float)Math.Cos(angle) * guideLength, rect.Y + (float)Math.Sin(angle) * guideLength);
-        g.DrawLine(Pens.Blue, point1, point2);
+        g.DrawLine(new Pen(ColorPalette.BrushLightBlue), point1, point2);
     }
 
     float elapsed = 0;
@@ -64,21 +65,17 @@ public class Player : IGameObject
 
         if (Input.GetKey(Keys.LButton)) {
             if(elapsed - lastFire >= fireRate){
-                if (HUD.Instance.GetAmmo() > 0) {
                         game.SpawnObject(new Bullet(rect.X + rect.Width / 2f, rect.Y + rect.Height / 2f));
                     lastFire = elapsed;
-                    HUD.Instance.RemoveAmmo(1);
-                }
             }
         }
 
         var monInsect = game.GetObjects<Monster>();
 
-        if (monInsect.Count > 0) {
-            if(monInsect[0].Rect.IntersectsWith(rect))
-            HUD.Instance.SubtractHealth(3f*delta);
+        for (int i = 0; i < monInsect.Count; i++) {
+            if (monInsect[i].Rect.IntersectsWith(rect))
+                HUD.Instance.SubtractHealth(0.5f * delta);
         }
-
         rect.X = Game.Clamp(rect.X, 0, game.GameArea.Width - rect.Width);
         rect.Y = Game.Clamp(rect.Y, 0, game.GameArea.Height - rect.Height);
     }

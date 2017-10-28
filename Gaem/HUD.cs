@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Gaem;
+using System;
 using System.Data;
 using System.Drawing;
 using System.Linq;
@@ -26,18 +27,18 @@ public class HUD : IGameObject
         }
     }
 
-    float health;
-    float minHealth;
-    float maxHealth;
-    float ammo;
+    HPBar healthBar;
+    Font font;
+
+    public double TotalTime;
 
     public HUD()
     {
-        health = 100f;
-        maxHealth = 100f;
-        minHealth = 100f;
-        ammo = Int32.MaxValue;
-        rect = new RectangleF(50, 50, 200, 32);
+        healthBar = new HPBar();
+        healthBar.Health = 100;
+        rect = new RectangleF(20, 20, 200, 32);
+        healthBar.rect = rect;
+        font = new Font(FontFamily.Families.Where((o) => o.Name == "Segoe UI").First(), 12);
         instance = this;
     }
 
@@ -48,11 +49,12 @@ public class HUD : IGameObject
 
     public void OnRender(Graphics g)
     {
-        g.FillRectangle(Brushes.Gray, rect.X, rect.Y, rect.Width, rect.Height);
-        g.FillRectangle(new SolidBrush(Color.FromArgb((int)(200-health*2), (int)health*2, 0)), rect.X, rect.Y, health * 2, rect.Height);
-        g.DrawRectangle(Pens.White, rect.X, rect.Y, rect.Width, rect.Height);
-        g.DrawString("HitPoints: " + Math.Floor(health), new Font(FontFamily.Families.Where((o) => o.Name == "Segoe UI").First(), 12), Brushes.Gray, new PointF(rect.X-2,rect.Y+34));
-        g.DrawString("Ammo: " + ammo, new Font(FontFamily.Families.Where((o) => o.Name == "Segoe UI").First(), 12), Brushes.Gray, game.GameArea.Right-96, game.GameArea.Bottom-32);
+        healthBar.OnRender(g);
+        g.DrawString($"HitPoints: {(int)healthBar.Health}", font, Brushes.White, new PointF(rect.X-2,rect.Y+34));
+
+        string text = $"Time: {(int)TotalTime}";
+        SizeF textMeasure = g.MeasureString(text, font);
+        g.DrawString(text, font, ColorPalette.BrushLightBlue, game.GameArea.Width - textMeasure.Width, game.GameArea.Height - textMeasure.Height);
     }
 
     public void OnSpawn(Game game)
@@ -62,37 +64,24 @@ public class HUD : IGameObject
 
     public void OnUpdate(float delta)
     {
-        
-    }
-
-    public float GetAmmo()
-    {
-        return ammo;
-    }
-
-    public void RemoveAmmo(float value)
-    {
-        if(ammo >=  value)
-        ammo -= value;
+        TotalTime += delta;
     }
 
     public void SetHealth(float value)
     {
-        health = Game.Clamp(value, minHealth, maxHealth);
+        healthBar.Health = value;
     }
 
     public void AddHealth(float value)
     {
-        if(health<100)
-        health += value;
+        healthBar.Health += value;
     }
 
     public void SubtractHealth(float value)
     {
-        if(health > 0 && value <= health)
-        health -= value;
+        healthBar.Health -= value;
 
-        if(health <= 1) {
+        if(healthBar.Health <= 1) {
             MessageBox.Show("You have lost :(");
             game.Quit();
         }

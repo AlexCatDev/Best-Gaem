@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Gaem;
+using System;
+using System.Collections.Generic;
 using System.Drawing;
 
 public class Bullet : IGameObject
@@ -18,15 +20,12 @@ public class Bullet : IGameObject
 
     public Bullet(float x, float y)
     {
-        rect = new RectangleF(x, y, 16, 16);
+        rect = new RectangleF(x - 12 , y - 12, 24, 24);
     }
 
     public void OnRender(Graphics g)
     {
-        g.FillEllipse(Brushes.Brown, rect);
-        g.FillEllipse(Brushes.Brown, rect.X + 16, rect.Y, 16, 16);
-        g.FillRectangle(Brushes.Brown, rect.X + 12, rect.Y - 32, 8, 32);
-        g.FillRectangle(Brushes.Pink, rect.X + 12, rect.Y - 32, 8, 6);
+        g.FillEllipse(ColorPalette.BrushLightBlue, rect);
     }
 
     public void OnSpawn(Game game)
@@ -39,27 +38,21 @@ public class Bullet : IGameObject
 
     public void OnUpdate(float delta)
     {
-        var mon = game.GetObjects<Monster>();
-
-        //rect.Y -= 16f * delta;
-        if (rect.Y < game.GameArea.Top) {
+        List<Monster> monsters = game.GetObjects<Monster>();
+        if (!rect.IntersectsWith(game.GameArea))
             game.DestroyObject(this);
-            return;
-        }
 
-        if (mon.Count > 0) {
-            Monster first = mon[0];
+        float dirX = (float)Math.Cos(angle);
+        float dirY = (float)Math.Sin(angle);
+        rect.X += (dirX * 30) * delta;
+        rect.Y += (dirY * 30) * delta;
 
-            float dirX = (float)Math.Cos(angle);
-            float dirY = (float)Math.Sin(angle);
-            rect.X += (dirX * 20) * delta;
-            rect.Y += (dirY * 20) * delta;
-
-            if (rect.IntersectsWith(first.Rect)) {
-                first.Hit(20f);
+        for (int i = 0; i < monsters.Count; i++) {
+            if (rect.IntersectsWith(monsters[i].Rect)) {
+                monsters[i].Hit(30f*delta);
                 game.DestroyObject(this);
             }
         }
-            
+
     }
 }

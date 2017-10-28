@@ -35,6 +35,9 @@ public class GameEngine
         get {
             return updateFrequency;
         }
+        set {
+            updateFrequency = value;
+        }
     }
 
     public GameEngine(Control parentContainer, float updateFrequency)

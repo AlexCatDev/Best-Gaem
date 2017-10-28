@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Gaem;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -32,6 +33,8 @@ public class Game
         //Update 60 times a second
         engine = new GameEngine(parentContainer, 1000f / 60f);
         engine.GameTick += Engine_GameTick;
+
+        ColorPalette.Initialize();
     }
 
     float elapsedTime = 0;
@@ -41,13 +44,13 @@ public class Game
     {
         elapsedTime += delta;
         frames++;
-        if(elapsedTime >= 2000/60) {
+        if(elapsedTime >= engine.UpdateFrequency / delta) {
             SetTitle("FPS: " + frames + " Objects: " + gameObjects.Count);
             frames = 0;
             elapsedTime = 0;
         }
 
-        bf.Graphics.Clear(Color.Black);
+        bf.Graphics.Clear(Color.FromArgb(255, 32, 32, 32));
         for (int i = 0; i < gameObjects.Count; i++) {
             var obj = gameObjects[i];
             obj.OnUpdate(delta);

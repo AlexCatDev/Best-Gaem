@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Gaem;
+using System;
 using System.Data;
 using System.Drawing;
 using System.Linq;
@@ -14,18 +15,23 @@ public class Monster : IGameObject
         }
     }
 
-    float health;
     float velX, velY;
     Random r = new Random();
     Game game;
+    Font font;
+    HPBar healthBar;
 
     public Monster()
     {
-        health = 1000;
+        healthBar = new HPBar();
+        healthBar.MaxHealth = 100f;
+        healthBar.Health = 100f;
         velX = 20;
         velY = 20;
         r = new Random();
         rect = new RectangleF(200,200,48,48);
+
+        font = new Font(FontFamily.Families.Where((o) => o.Name == "Segoe UI").First(), 12);
     }
 
     public void OnDestroy()
@@ -35,19 +41,13 @@ public class Monster : IGameObject
 
     public void OnRender(Graphics g)
     {
-        g.DrawString("HP: " + Math.Floor(health), new Font(FontFamily.Families.Where((o) => o.Name == "Segoe UI").First(), 12), Brushes.White, new PointF(rect.X + 2, rect.Y - 34));
-        g.FillRectangle(Brushes.Red, rect);
+        healthBar.OnRender(g);
+        g.FillRectangle(ColorPalette.BrushLightRed, rect);
     }
 
     public void Hit(float damage)
     {
-        health -= damage;
-
-        if (health < 1) {
-            game.DestroyObject(this);
-            MessageBox.Show("Eyy u won skrrrt");
-            game.Quit();
-        }
+        healthBar.Health -= damage;
     }
 
     public void OnSpawn(Game game)
@@ -57,16 +57,32 @@ public class Monster : IGameObject
 
     public void OnUpdate(float delta)
     {
-        if (rect.X < game.GameArea.Left)
-            velX = r.Next(8, 30);
-        else if(rect.X > game.GameArea.Width-rect.Width)
+        healthBar.rect = new RectangleF(rect.X, rect.Y - 20, rect.Width, 12);
+
+        Player player = game.GetObjects<Player>().First();
+
+        float angleFromPlayer = (float)Math.Atan2(player.Rect.Y - rect.Y, player.Rect.X - rect.X);
+        float cos = (float)Math.Cos(angleFromPlayer);
+
+        if (rect.X < game.GameArea.Left) {
+            if (r.Next(0, 10) > 4) {
+                velX = r.Next(8, 30);
+            }else {
+                if (cos > 0.6)
+                    velX = cos * 20f * delta;
+                else
+                    velX = r.Next(8, 30);
+            }
+        } else if (rect.X > game.GameArea.Width - rect.Width) {
             velX = -r.Next(8, 30);
+        }
 
-        if (rect.Y <= 0)
+        if (rect.Y <= 0) {
             velY = r.Next(8, 30);
-        else if (rect.Y > game.GameArea.Height - rect.Height)
+        } else if (rect.Y > game.GameArea.Height - rect.Height) {
             velY = -r.Next(8, 30);
-
+        }
+            
         rect.Y += velY * delta;
         rect.X += velX * delta;
     }

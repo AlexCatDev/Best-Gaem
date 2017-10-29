@@ -44,12 +44,12 @@ public class Bullet : IGameObject
 
         float dirX = (float)Math.Cos(angle);
         float dirY = (float)Math.Sin(angle);
-        rect.X += (dirX * 30) * delta;
-        rect.Y += (dirY * 30) * delta;
+        rect.X += (dirX * 25) * delta;
+        rect.Y += (dirY * 25) * delta;
 
         for (int i = 0; i < monsters.Count; i++) {
             if (rect.IntersectsWith(monsters[i].Rect)) {
-                monsters[i].Hit(30f*delta);
+                monsters[i].Hit(10f);
                 game.DestroyObject(this);
             }
         }

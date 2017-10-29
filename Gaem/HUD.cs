@@ -64,7 +64,7 @@ public class HUD : IGameObject
 
     public void OnUpdate(float delta)
     {
-        TotalTime += delta;
+        TotalTime += delta * game.Engine.UpdateFrequency;
     }
 
     public void SetHealth(float value)
@@ -83,7 +83,7 @@ public class HUD : IGameObject
 
         if(healthBar.Health <= 1) {
             MessageBox.Show("You have lost :(");
-            game.Quit();
+            //game.Quit();
         }
     }
 }

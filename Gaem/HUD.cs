@@ -5,66 +5,40 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 
-public class HUD : IGameObject
+public class HUD : GameObject
 {
     static HUD instance;
 
-    public static HUD Instance {
-        get {
-            if (instance == null)
-                instance = new HUD();
+    public static HUD Instance => instance;
 
-            return instance;
-        }
-    }
-
-    RectangleF rect;
-    Game game;
-
-    public RectangleF Rect {
-        get {
-            return rect;
-        }
-    }
-
-    HPBar healthBar;
+    HealthBar healthBar;
     Font font;
 
     public double TotalTime;
 
     public HUD()
     {
-        healthBar = new HPBar();
+        healthBar = new HealthBar();
         healthBar.Health = 100;
-        rect = new RectangleF(20, 20, 200, 32);
-        healthBar.rect = rect;
+        Rect = new RectangleF(20, 20, 200, 32);
+        healthBar.Rect = Rect;
         font = new Font(FontFamily.Families.Where((o) => o.Name == "Segoe UI").First(), 12);
         instance = this;
     }
 
-    public void OnDestroy()
-    {
-
-    }
-
-    public void OnRender(Graphics g)
+    public override void OnRender(Graphics g)
     {
         healthBar.OnRender(g);
-        g.DrawString($"HitPoints: {(int)healthBar.Health}", font, Brushes.White, new PointF(rect.X-2,rect.Y+34));
+        g.DrawString($"HitPoints: {(int)healthBar.Health}", font, Brushes.White, new PointF(Rect.X-2, Rect.Y+34));
 
         string text = $"Time: {(int)TotalTime}";
         SizeF textMeasure = g.MeasureString(text, font);
-        g.DrawString(text, font, ColorPalette.BrushLightBlue, game.GameArea.Width - textMeasure.Width, game.GameArea.Height - textMeasure.Height);
+        g.DrawString(text, font, ColorPalette.BrushLightBlue, Game.Instance.GameArea.Width - textMeasure.Width, Game.Instance.GameArea.Height - textMeasure.Height);
     }
 
-    public void OnSpawn(Game game)
+    public override void OnUpdate(float delta)
     {
-        this.game = game;
-    }
-
-    public void OnUpdate(float delta)
-    {
-        TotalTime += delta * game.Engine.UpdateFrequency;
+        TotalTime += delta;
     }
 
     public void SetHealth(float value)

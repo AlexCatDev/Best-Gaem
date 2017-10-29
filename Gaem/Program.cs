@@ -14,9 +14,8 @@ namespace Gaem
         [STAThread]
         static void Main()
         {
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Form1());
+            Game g = new Game();
+            g.Run();
         }
     }
 }

@@ -1,11 +1,9 @@
 ﻿using System.Drawing;
 
-public interface IGameObject
+public abstract class GameObject
 {
-    RectangleF Rect { get; }
+    public RectangleF Rect;
 
-    void OnSpawn(Game game);
-    void OnDestroy();
-    void OnRender(Graphics g);
-    void OnUpdate(float delta);
+    public abstract void OnRender(Graphics g);
+    public abstract void OnUpdate(float delta);
 }

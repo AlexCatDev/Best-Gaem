@@ -4,10 +4,8 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 
-public class Player : IGameObject
+public class Player : GameObject
 {
-    Game game;
-    RectangleF rect;
     float speed;
 
     float fireRate;
@@ -15,85 +13,69 @@ public class Player : IGameObject
 
     float guideLength = 200f;
 
-    public RectangleF Rect {
-        get {
-            return rect;
-        }
-    }
-
     public Player()
     {
-        rect = new RectangleF(100,200,48,48);
-        speed = 16f;
+        Rect = new RectangleF(100,200,48,48);
+        speed = 800f;
         lastFire = 0;
-        fireRate = 20;
+        fireRate = 0.4f;
     }
 
 
-    public void OnRender(Graphics g)
+    public override void OnRender(Graphics g)
     {
         g.SmoothingMode = SmoothingMode.AntiAlias;
-        g.FillRectangle(ColorPalette.BrushLightBlue, rect);
-        PointF point1 = new PointF(rect.X + rect.Width / 2f, rect.Y + rect.Height / 2f);
+        g.FillRectangle(ColorPalette.BrushLightBlue, Rect);
+        PointF point1 = new PointF(Rect.X + Rect.Width / 2f, Rect.Y + Rect.Height / 2f);
 
-        float angle = (float)Math.Atan2(game.CursorPosition.Y - rect.Y, game.CursorPosition.X - rect.X);
+        float angle = (float)Math.Atan2(Game.Instance.CursorPosition.Y - Rect.Y, Game.Instance.CursorPosition.X - Rect.X);
 
-        PointF point2 = new PointF(rect.X + (float)Math.Cos(angle) * guideLength, rect.Y + (float)Math.Sin(angle) * guideLength);
+        PointF point2 = new PointF(Rect.X + (float)Math.Cos(angle) * guideLength, Rect.Y + (float)Math.Sin(angle) * guideLength);
         g.DrawLine(new Pen(ColorPalette.BrushLightBlue), point1, point2);
     }
 
     float elapsed = 0;
 
-    public void OnUpdate(float delta)
+    public override void OnUpdate(float delta)
     {
         elapsed += delta;
 
         if (Input.GetKey(Keys.W))
-            rect.Y -= speed * delta;
+            Rect.Y -= speed * delta;
 
         if (Input.GetKey(Keys.S))
-            rect.Y += speed * delta;
+            Rect.Y += speed * delta;
 
         if (Input.GetKey(Keys.D))
-            rect.X += speed * delta;
+            Rect.X += speed * delta;
 
         if (Input.GetKey(Keys.A))
-            rect.X -= speed * delta;
+            Rect.X -= speed * delta;
 
         if (Input.GetKey(Keys.H))
             HUD.Instance.AddHealth(1);
 
         if (Input.GetKey(Keys.LButton) || Input.GetKey(Keys.Space)) {
             if(elapsed - lastFire >= fireRate){
-                        game.SpawnObject(new Bullet(rect.X + rect.Width / 2f, rect.Y + rect.Height / 2f));
+                        Game.Instance.SpawnObject(new Bullet(Rect.X + Rect.Width / 2f, Rect.Y + Rect.Height / 2f));
                     lastFire = elapsed;
             }
         }
 
-        var monInsect = game.GetObjects<Monster>();
-        var bInsect = game.GetObjects<EnemyBullet>();
+        var monInsect = Game.Instance.GetObjects<Monster>();
+        var bInsect = Game.Instance.GetObjects<EnemyBullet>();
 
         for (int i = 0; i < monInsect.Count; i++) {
-            if (monInsect[i].Rect.IntersectsWith(rect))
+            if (monInsect[i].Rect.IntersectsWith(Rect))
                 HUD.Instance.SubtractHealth(0.5f * delta);
         }
 
         for (int i = 0; i < bInsect.Count; i++) {
-            if (bInsect[i].Rect.IntersectsWith(rect))
+            if (bInsect[i].Rect.IntersectsWith(Rect))
                 HUD.Instance.SubtractHealth(0.5f * delta);
         }
 
-        rect.X = Game.Clamp(rect.X, 0, game.GameArea.Width - rect.Width);
-        rect.Y = Game.Clamp(rect.Y, 0, game.GameArea.Height - rect.Height);
-    }
-
-    public void OnSpawn(Game game)
-    {
-        this.game = game; 
-    }
-
-    public void OnDestroy()
-    {
-        
+        Rect.X = Game.Clamp(Rect.X, 0, Game.Instance.GameArea.Width - Rect.Width);
+        Rect.Y = Game.Clamp(Rect.Y, 0, Game.Instance.GameArea.Height - Rect.Height);
     }
 }

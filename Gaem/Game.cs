@@ -1,72 +1,98 @@
 ﻿using Gaem;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
+using System.Threading;
 using System.Windows.Forms;
 
 public class Game
 {
-    public IList<IGameObject> GameObjects {
-        get {
-            return gameObjects.AsReadOnly();
-        }
-    }
+    List<GameObject> gameObjects = new List<GameObject>();
 
-    List<IGameObject> gameObjects = new List<IGameObject>();
-
-    GameEngine engine;
-    Control parentContainer;
-
-    public GameEngine Engine {
-        get { return engine; }
-    }
-
-    public RectangleF GameArea { get; set; }
+    public RectangleF GameArea => form.DisplayRectangle;
 
     private BufferedGraphics bf;
 
-    public Game(Control parentContainer)
-    {
-        this.parentContainer = parentContainer;
-        BufferedGraphicsContext context = BufferedGraphicsManager.Current;
-        bf = context.Allocate(parentContainer.CreateGraphics(), parentContainer.DisplayRectangle);
-        GameArea = parentContainer.ClientRectangle;
-        //Update 60 times a second
-        engine = new GameEngine(parentContainer, 1000f / 60f);
-        engine.GameTick += Engine_GameTick;
+    private static Game instance;
+    public static Game Instance => instance;
 
+    private Form form;
+    private bool running;
+    private Thread gameThread;
+    private Stopwatch gameWatch;
+
+    public Game()
+    {
+        form = new Form();
+        form.StartPosition = FormStartPosition.CenterScreen;
+        form.Size = new Size(1024, 720);
+        form.MinimumSize = form.Size;
+        form.MaximumSize = form.Size;
+
+        form.Text = "Game!";
+
+        form.FormClosing += (s, e) => {
+            running = false;
+            gameThread.Join();
+        };
+
+        form.Load += (s, e)=> {
+            running = true;
+            gameThread.Start();
+        };
+
+        bf = BufferedGraphicsManager.Current.Allocate(form.CreateGraphics(), form.DisplayRectangle);
+
+        gameThread = new Thread(gameLoop);
+
+        Control.CheckForIllegalCrossThreadCalls = false;
         ColorPalette.Initialize();
+
+        instance = this;
     }
+
 
     float elapsedTime = 0;
     int frames = 0;
-    //Delta is how our accuracy of time
-    private void Engine_GameTick(float delta)
-    {
-        elapsedTime += delta;
-        frames++;
-        if(elapsedTime >= engine.UpdateFrequency / delta) {
-            SetTitle("FPS: " + frames + " Objects: " + gameObjects.Count);
-            frames = 0;
-            elapsedTime = 0;
-        }
 
-        bf.Graphics.Clear(Color.FromArgb(255, 32, 32, 32));
-        for (int i = 0; i < gameObjects.Count; i++) {
-            var obj = gameObjects[i];
-            obj.OnUpdate(delta);
-        }
+    private void gameLoop() {
+        gameWatch = Stopwatch.StartNew();
 
-        for (int i = 0; i < GameObjects.Count; i++) {
-            GameObjects[i].OnRender(bf.Graphics);
-        }
+        SpawnObject(new Player());
+        SpawnObject(new Monster());
+        SpawnObject(new HUD());
 
-        bf.Render();
+        while (running) {
+            float delta = ((float)gameWatch.ElapsedTicks / Stopwatch.Frequency);
+            gameWatch.Restart();
+
+            elapsedTime += delta;
+            frames++;
+            if (elapsedTime >= 1) {
+                SetTitle("FPS: " + frames + " Objects: " + gameObjects.Count);
+                frames = 0;
+                elapsedTime = 0;
+            }
+            
+
+            bf.Graphics.Clear(Color.FromArgb(255, 32, 32, 32));
+            for (int i = 0; i < gameObjects.Count; i++) {
+                var obj = gameObjects[i];
+                obj.OnUpdate(delta);
+            }
+
+            for (int i = 0; i < gameObjects.Count; i++) {
+                gameObjects[i].OnRender(bf.Graphics);
+            }
+
+            bf.Render();
+        }
     }
 
-    public Point CursorPosition => parentContainer.PointToClient (Cursor.Position);
+    public Point CursorPosition => form.PointToClient (Cursor.Position);
 
     public List<T> GetObjects<T>()
-        where T : IGameObject
+        where T : GameObject
     {
         List<T> temp = new List<T>();
         for (int i = 0; i < gameObjects.Count; i++) {
@@ -79,32 +105,23 @@ public class Game
 
     public void SetTitle(string text)
     {
-        parentContainer.Text = text;
+        form.Text = text;
     }
 
-    public void AppendTitle(string text)
+    public void DestroyObject(GameObject obj)
     {
-        parentContainer.Text += text;
-    }
-
-    public void DestroyObject(IGameObject obj)
-    {
-        obj.OnDestroy();
         gameObjects.Remove(obj);
     }
 
-    public void SpawnObject(IGameObject obj)
+    public void SpawnObject(GameObject obj)
     {
-        obj.OnSpawn(this);
         gameObjects.Add(obj);
     }
 
-    public void Init()
-    {
-        SpawnObject(new Player());
-        SpawnObject(new Monster());
-        SpawnObject(new HUD());
-        engine.Init();
+    public void Run() {
+        if (!running) {
+            Application.Run(form);
+        }
     }
 
     public static float Clamp(float value, float min, float max)
@@ -119,6 +136,6 @@ public class Game
 
     public void Quit()
     {
-        engine.Quit();
+        form.Close();
     }
 }

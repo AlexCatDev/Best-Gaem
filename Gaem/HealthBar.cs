@@ -7,13 +7,10 @@ using System.Threading.Tasks;
 
 namespace Gaem
 {
-    public class HPBar : IGameObject
+    public class HealthBar : GameObject
     {
-        public RectangleF rect;
-
-        public RectangleF Rect => rect;
-
         private float health;
+
         public float Health {
             get {
                 return health;
@@ -33,17 +30,13 @@ namespace Gaem
             
         }
 
-        public void OnRender(Graphics g) {
-            g.FillRectangle(ColorPalette.BrushLightRed, rect);
-            g.FillRectangle(ColorPalette.BrushLightGreen, new RectangleF(rect.X, rect.Y, (rect.Width / MaxHealth) * Health, rect.Height));
-            g.DrawRectangle(new Pen(Color.White), rect.X, rect.Y, rect.Width, rect.Height);
+        public override void OnRender(Graphics g) {
+            g.FillRectangle(ColorPalette.BrushLightRed, Rect);
+            g.FillRectangle(ColorPalette.BrushLightGreen, new RectangleF(Rect.X, Rect.Y, (Rect.Width / MaxHealth) * Health, Rect.Height));
+            g.DrawRectangle(new Pen(Color.White), Rect.X, Rect.Y, Rect.Width, Rect.Height);
         }
 
-        public void OnSpawn(Game game) {
-         
-        }
-
-        public void OnUpdate(float delta) {
+        public override void OnUpdate(float delta) {
            
         }
     }

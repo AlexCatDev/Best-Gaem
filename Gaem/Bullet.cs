@@ -20,7 +20,6 @@ public class Bullet : GameObject
 
     public override void OnUpdate(float delta)
     {
-        List<Monster> monsters = Game.Instance.GetObjects<Monster>();
         if (!Rect.IntersectsWith(Game.Instance.GameArea))
             Game.Instance.DestroyObject(this);
 
@@ -29,12 +28,12 @@ public class Bullet : GameObject
         Rect.X += (dirX * 1200) * delta;
         Rect.Y += (dirY * 1200) * delta;
 
-        for (int i = 0; i < monsters.Count; i++) {
-            if (Rect.IntersectsWith(monsters[i].Rect)) {
-                monsters[i].Hit(10f);
+        Game.Instance.GetObjects<Monster>((monster) => {
+            if (monster.Rect.IntersectsWith(Rect)) {
+                monster.Hit(10f);
                 Game.Instance.DestroyObject(this);
             }
-        }
+        });
 
     }
 }

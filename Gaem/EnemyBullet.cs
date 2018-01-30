@@ -17,7 +17,7 @@ namespace Gaem
             Rect = new RectangleF(x - 9, y - 9, 18, 18);
             this.speed = speed;
 
-            Player player = Game.Instance.GetObjects<Player>().First();
+            Player player = Game.Instance.GetObject<Player>();
 
             float angle = (float)Math.Atan2(player.Rect.Y - Rect.Y, player.Rect.X - Rect.X);
             dirX = (float)Math.Cos(angle);

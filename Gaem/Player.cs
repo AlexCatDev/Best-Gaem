@@ -62,18 +62,17 @@ public class Player : GameObject
             }
         }
 
-        var monInsect = Game.Instance.GetObjects<Monster>();
-        var bInsect = Game.Instance.GetObjects<EnemyBullet>();
+        Game.Instance.GetObjects<Monster>((monster) => {
+            if (monster.Rect.IntersectsWith(Rect))
+                HUD.Instance.SubtractHealth(20f * delta);
+        });
 
-        for (int i = 0; i < monInsect.Count; i++) {
-            if (monInsect[i].Rect.IntersectsWith(Rect))
-                HUD.Instance.SubtractHealth(0.5f * delta);
-        }
-
-        for (int i = 0; i < bInsect.Count; i++) {
-            if (bInsect[i].Rect.IntersectsWith(Rect))
-                HUD.Instance.SubtractHealth(0.5f * delta);
-        }
+        Game.Instance.GetObjects<EnemyBullet>((enemyBullet) => {
+            if (enemyBullet.Rect.IntersectsWith(Rect)) {
+                HUD.Instance.SubtractHealth(5f);
+                Game.Instance.DestroyObject(enemyBullet);
+            }
+        });
 
         Rect.X = Game.Clamp(Rect.X, 0, Game.Instance.GameArea.Width - Rect.Width);
         Rect.Y = Game.Clamp(Rect.Y, 0, Game.Instance.GameArea.Height - Rect.Height);

@@ -1,4 +1,5 @@
 ﻿using Gaem;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
@@ -91,16 +92,22 @@ public class Game
 
     public Point CursorPosition => form.PointToClient (Cursor.Position);
 
-    public List<T> GetObjects<T>()
-        where T : GameObject
-    {
-        List<T> temp = new List<T>();
+    public void GetObjects<T>(Action<T> action) where T : GameObject {
         for (int i = 0; i < gameObjects.Count; i++) {
-            if (gameObjects[i] is T)
-                temp.Add((T)gameObjects[i]);
+            T obj = gameObjects[i] as T;
+            if (obj != null)
+                action?.Invoke(obj);
+        }
+    }
+
+    public T GetObject<T>() where T : GameObject {
+        for (int i = 0; i < gameObjects.Count; i++) {
+            T obj = gameObjects[i] as T;
+            if (obj != null)
+                return obj;
         }
 
-        return temp;
+        return null;
     }
 
     public void SetTitle(string text)

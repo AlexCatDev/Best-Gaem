@@ -80,10 +80,7 @@ public class Game
             for (int i = 0; i < gameObjects.Count; i++) {
                 var obj = gameObjects[i];
                 obj.OnUpdate(delta);
-            }
-
-            for (int i = 0; i < gameObjects.Count; i++) {
-                gameObjects[i].OnRender(bf.Graphics);
+                obj.OnRender(bf.Graphics);
             }
 
             bf.Render();

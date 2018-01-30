@@ -17,12 +17,16 @@ namespace Gaem
 
         public static Color ColorFlatDark => Color.FromArgb(32, 32, 32);
 
+        public static Color ColorYellow => Color.FromArgb(241, 196, 15);
+
         public static SolidBrush BrushLightRed { get; private set; }
         public static SolidBrush BrushLightGreen { get; private set; }
         public static SolidBrush BrushLightBlue { get; private set; }
         public static SolidBrush BrushDarkBlue { get; private set; }
+        public static SolidBrush BrushYellow { get; private set; }
 
         public static void Initialize() {
+            BrushYellow = new SolidBrush(ColorYellow);
             BrushLightRed = new SolidBrush(ColorLightRed);
             BrushLightGreen = new SolidBrush(ColorLightGreen);
             BrushLightBlue = new SolidBrush(ColorLightBlue);

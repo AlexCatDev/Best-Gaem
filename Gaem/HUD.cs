@@ -39,6 +39,7 @@ public class HUD : GameObject
     public override void OnUpdate(float delta)
     {
         TotalTime += delta;
+        healthBar.OnUpdate(delta);
     }
 
     public void SetHealth(float value)

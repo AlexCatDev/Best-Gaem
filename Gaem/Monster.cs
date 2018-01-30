@@ -21,7 +21,7 @@ public class Monster : GameObject
         healthBar.Health = 100f;
         velX = 10;
         r = new Random();
-        Rect = new RectangleF(0, 120, 48, 48);
+        Rect = new RectangleF(0, 120, 56, 56);
 
         font = new Font(FontFamily.Families.Where((o) => o.Name == "Segoe UI").First(), 12);
     }
@@ -59,5 +59,6 @@ public class Monster : GameObject
             velX = r.Next(600, 1100);
 
         Rect.X += velX * delta;
+        healthBar.OnUpdate(delta);
     }
 }

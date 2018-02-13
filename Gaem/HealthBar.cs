@@ -9,9 +9,9 @@ namespace Gaem
 {
     public class HealthBar : GameObject
     {
-        public const float AnimationDelayDefault = 0.65f;
+        public const float AnimationDelayDefault = 0.5f;
         public const float MaxHealthDefault = 100f;
-        public const float AnimationDurationDefault = 0.70f;
+        public const float AnimationDurationDefault = 0.6f;
 
         private TransformFloat transform;
         private float health;

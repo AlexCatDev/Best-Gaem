@@ -30,7 +30,7 @@ public class Bullet : GameObject
 
         Game.Instance.GetObjects<Monster>((monster) => {
             if (monster.Rect.IntersectsWith(Rect)) {
-                monster.Hit(10f);
+                monster.Hit(15f);
                 Game.Instance.DestroyObject(this);
             }
         });

@@ -9,18 +9,24 @@ namespace Gaem
 {
     public class HealthBar : GameObject
     {
+        public const float AnimationDelayDefault = 0.65f;
+        public const float MaxHealthDefault = 100f;
+        public const float AnimationDurationDefault = 0.70f;
+
         private TransformFloat transform;
         private float health;
+        private float animationDelayElapsed;
 
         public float Health {
             get {
                 return health;
             }
+
             set {
-                if (transform.IsFinished) {
-                    transform.Duration = 0.75f;
+                if (animationDelayElapsed >= AnimationDelayDefault)
                     transform.StartValue = health;
-                }
+
+                transform.Duration = AnimationDurationDefault;
 
                 if (value > MaxHealth)
                     health = MaxHealth;
@@ -28,21 +34,20 @@ namespace Gaem
                     health = 0;
                 else
                     health = value;
-                
+
+                animationDelayElapsed = 0f;
                 transform.EndValue = health;
             }
         }
-        public float MaxHealth = 100f;
+
+        public float MaxHealth = MaxHealthDefault;
 
         public HealthBar() {
             transform = new TransformFloat();
-            transform.Easing = EasingTypes.OutCirc;
-            transform.Duration = 0.75f;
+            transform.Easing = EasingTypes.OutQuart;
+            transform.Duration = AnimationDurationDefault;
             transform.StartValue = MaxHealth;
-        }
-
-        public void OnDestroy() {
-            
+            transform.EndValue = MaxHealth;
         }
 
         public override void OnRender(Graphics g) {
@@ -54,7 +59,10 @@ namespace Gaem
         }
 
         public override void OnUpdate(float delta) {
-            transform.Update(delta);
+            animationDelayElapsed += delta;
+
+            if (animationDelayElapsed >= AnimationDelayDefault)
+                transform.Update(delta);
         }
     }
 }

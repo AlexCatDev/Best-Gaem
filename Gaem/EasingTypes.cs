@@ -36,6 +36,7 @@ namespace Gaem
         InOutBack,
         InBounce,
         OutBounce,
-        InOutBounce
+        InOutBounce,
+        OutPow10
     }
 }

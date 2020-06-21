@@ -9,15 +9,17 @@ public class Player : GameObject
     float speed;
 
     float fireRate;
-    float lastFire;
+    float shootTimer;
 
-    float guideLength = 200f;
+    float dashTimer = 0;
+
+    float guideLength = 150f;
 
     public Player()
     {
         Rect = new RectangleF(100,200,48,48);
         speed = 800f;
-        lastFire = 0;
+        shootTimer = 0;
         fireRate = 0.4f;
     }
 
@@ -32,13 +34,14 @@ public class Player : GameObject
 
         PointF point2 = new PointF(Rect.X + (float)Math.Cos(angle) * guideLength, Rect.Y + (float)Math.Sin(angle) * guideLength);
         g.DrawLine(new Pen(ColorPalette.BrushLightBlue), point1, point2);
-    }
 
-    float elapsed = 0;
+        g.DrawString("Speed: " + speed, HUD.Instance.font, Brushes.White, new PointF(200, 200));
+    }
 
     public override void OnUpdate(float delta)
     {
-        elapsed += delta;
+        shootTimer += delta;
+        dashTimer += delta;
 
         if (Input.GetKey(Keys.W))
             Rect.Y -= speed * delta;
@@ -56,12 +59,21 @@ public class Player : GameObject
             HUD.Instance.AddHealth(1);
 
         if (Input.GetKey(Keys.LButton) || Input.GetKey(Keys.Space)) {
-            if(elapsed - lastFire >= fireRate){
+            if(shootTimer >= fireRate){
                         Game.Instance.SpawnObject(new Bullet(Rect.X + Rect.Width / 2f, Rect.Y + Rect.Height / 2f));
-                    lastFire = elapsed;
+                    shootTimer = 0;
             }
         }
 
+        if (Input.GetKey(Keys.LShiftKey))
+        {
+            if (dashTimer >= 2)
+            {
+                
+                dashTimer = 0;
+            }
+        }
+        
         Game.Instance.GetObjects<Monster>((monster) => {
             if (monster.Rect.IntersectsWith(Rect))
                 HUD.Instance.SubtractHealth(20f * delta);

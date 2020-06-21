@@ -12,7 +12,7 @@ public class HUD : GameObject
     public static HUD Instance => instance;
 
     HealthBar healthBar;
-    Font font;
+    public Font font;
 
     public double TotalTime;
 

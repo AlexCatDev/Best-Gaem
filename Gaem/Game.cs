@@ -26,7 +26,7 @@ public class Game
     {
         form = new Form();
         form.StartPosition = FormStartPosition.CenterScreen;
-        form.Size = new Size(1024, 720);
+        form.Size = new Size(1280, 720);
         form.MinimumSize = form.Size;
         form.MaximumSize = form.Size;
 

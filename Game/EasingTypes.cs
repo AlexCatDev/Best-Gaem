@@ -1,4 +1,4 @@
-namespace Gaem
+namespace Game
 {
     public enum EasingTypes
     {

@@ -4,7 +4,7 @@
 using System;
 using System.Drawing;
 
-namespace Gaem
+namespace Game
 {
     public static class Interpolation
     {
